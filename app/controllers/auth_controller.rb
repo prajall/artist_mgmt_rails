@@ -4,6 +4,10 @@ class AuthController < ApplicationController
     password = params[:password]
 
     user = User.find_by(email: email)
+
+    if !user
+     return render json: {error: "User not found."}, status: 404
+    end
     
     if user&.authenticate(password)
       access_token = JsonWebToken.generate_access_token(user)
@@ -28,7 +32,7 @@ class AuthController < ApplicationController
       render json: {message: "Login Successful"}
       
     else
-      render json: {error: "User not found."}, status: 404
+      render json: {error: "Invalid Credential"}, status: 400
     end
   end
 end
