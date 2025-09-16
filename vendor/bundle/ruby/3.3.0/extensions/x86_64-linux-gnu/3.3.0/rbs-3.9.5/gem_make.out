@@ -1,0 +1,28 @@
+current directory: /home/prajal/Cloco/ruby/artist_management/vendor/bundle/ruby/3.3.0/gems/rbs-3.9.5/ext/rbs_extension
+/usr/bin/ruby3.3 -I/usr/lib/ruby/vendor_ruby extconf.rb
+checking for whether -std=gnu99 is accepted as CFLAGS... yes
+creating Makefile
+
+current directory: /home/prajal/Cloco/ruby/artist_management/vendor/bundle/ruby/3.3.0/gems/rbs-3.9.5/ext/rbs_extension
+make DESTDIR\= sitearchdir\=./.gem.20250915-29507-pkqdwj sitelibdir\=./.gem.20250915-29507-pkqdwj clean
+
+current directory: /home/prajal/Cloco/ruby/artist_management/vendor/bundle/ruby/3.3.0/gems/rbs-3.9.5/ext/rbs_extension
+make DESTDIR\= sitearchdir\=./.gem.20250915-29507-pkqdwj sitelibdir\=./.gem.20250915-29507-pkqdwj
+compiling ./../../src/constants.c
+compiling lexer.c
+compiling lexstate.c
+compiling location.c
+compiling main.c
+compiling parser.c
+compiling parserstate.c
+compiling ./../../src/util/rbs_constant_pool.c
+compiling ./../../src/ruby_objs.c
+compiling unescape.c
+linking shared-object rbs_extension.so
+
+current directory: /home/prajal/Cloco/ruby/artist_management/vendor/bundle/ruby/3.3.0/gems/rbs-3.9.5/ext/rbs_extension
+make DESTDIR\= sitearchdir\=./.gem.20250915-29507-pkqdwj sitelibdir\=./.gem.20250915-29507-pkqdwj install
+/usr/bin/install -c -m 0755 rbs_extension.so ./.gem.20250915-29507-pkqdwj
+
+current directory: /home/prajal/Cloco/ruby/artist_management/vendor/bundle/ruby/3.3.0/gems/rbs-3.9.5/ext/rbs_extension
+make DESTDIR\= sitearchdir\=./.gem.20250915-29507-pkqdwj sitelibdir\=./.gem.20250915-29507-pkqdwj clean

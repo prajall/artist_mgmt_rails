@@ -1,8 +1,13 @@
 # Omakase Ruby styling for Rails
 inherit_gem: { rubocop-rails-omakase: rubocop.yml }
-
+Layout/TrailingWhitespace:
+  Enabled: false
 # Overwrite or add rules to create your own house style
 #
 # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
 # Layout/SpaceInsideArrayLiteralBrackets:
 #   Enabled: false
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: false
+Layout/TrailingEmptyLines:
+  Enabled: false
