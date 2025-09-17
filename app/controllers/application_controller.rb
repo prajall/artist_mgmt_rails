@@ -13,14 +13,14 @@ class ApplicationController < ActionController::API
   end
 
   def is_super_admin
-    render json: { error: "Forbidden" }, status: :forbidden unless current_user&.role === "super_admin" 
+    render json: { error: "Forbidden" }, status: :forbidden unless current_user&.super_admin?
   end
 
   def is_artist
-    render json: { error: "Forbidden" }, status: :forbidden unless current_user&.role === "artist"
+    render json: { error: "Forbidden" }, status: :forbidden unless current_user&.artist?
   end
 
   def is_artist_manager
-    render json: { error: "Forbidden" }, status: :forbidden unless current_user&.role === "artist_manager"
+    render json: { error: "Forbidden" }, status: :forbidden unless current_user&.artist_manager?
   end
 end
