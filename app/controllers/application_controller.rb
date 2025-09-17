@@ -1,3 +1,26 @@
 class ApplicationController < ActionController::API
   include ActionController::Cookies
+
+  before_action :authorize_request
+  attr_accessor :current_user
+  
+  def authorize_request
+    access_token = cookies.signed[:access_token]
+    decoded = JsonWebToken.decode(access_token)
+    @current_user = User.find_by(id: decoded["id"]) if decoded 
+    #  puts "Current user: #{current_user.id} #{current_user.email} #{current_user.role}" if current_user 
+    render json: { error: "Unauthorized" }, status: :unauthorized unless current_user
+  end
+
+  def is_super_admin
+    render json: { error: "Forbidden" }, status: :forbidden unless current_user&.role === "super_admin" 
+  end
+
+  def is_artist
+    render json: { error: "Forbidden" }, status: :forbidden unless current_user&.role === "artist"
+  end
+
+  def is_artist_manager
+    render json: { error: "Forbidden" }, status: :forbidden unless current_user&.role === "artist_manager"
+  end
 end

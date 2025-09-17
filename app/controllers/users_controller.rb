@@ -1,17 +1,5 @@
 class UsersController < ApplicationController
-  # GET /users
-  def index
-    @users = User.all
-
-    render json: @users
-  end
-
-  # GET /users/1
-  def show
-    render json: @user
-  end
-
-  # POST /users
+  before_action :is_super_admin, only: [ :create ]
   def create
     user = User.new(user_params)
     if user.save
@@ -19,6 +7,13 @@ class UsersController < ApplicationController
     else
       render json: {errors: user.errors.full_messages}, status: :unprocessable_entity
     end
+  end
+
+  def profile
+    puts current_user
+    render json: {
+      user: current_user.slice(:id, :first_name, :last_name, :email, :role, :phone, :gender, :address, :dob, :created_at, :updated_at)
+    }
   end
 
   # PATCH/PUT /users/1

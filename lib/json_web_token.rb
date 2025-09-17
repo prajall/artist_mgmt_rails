@@ -6,19 +6,21 @@ class JsonWebToken
   REFRESH_TOKEN_EXPIRY = 7.days.freeze
 
   def self.encode(payload, exp = 24.hours.from_now)
-    puts "Payload: #{payload}"
+    payload[:exp] = exp.to_i
     encoded = JWT.encode(payload, SECRET_KEY)
-    puts "Encoded: #{encoded}"
     encoded
   end
 
   def self.decode(token) 
-    decoded = JWT.decode(token, SECRET_KEY)[0]
-    puts "Decoded: #{decoded}"
+    decoded = JWT.decode(token, SECRET_KEY,  true, { algorithm: "HS256" })[0]
     decoded
     # HashWithIndifferentAccess.new(decoded)
 
-  rescue JWT::DecodeError, JWT::ExpiredSignature
+  rescue JWT::DecodeError=> e
+    puts "Invalid Token #{e}"
+    nil
+  rescue JWT::ExpiredSignature=> e
+    puts "Token Expired #{e}"
     nil
   end
 
