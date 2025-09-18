@@ -1,5 +1,7 @@
 class UsersController < ApplicationController
-  before_action :is_super_admin, only: [ :create ]
+  include PermissionModule
+
+  before_action -> { authorize_role(%w[super_admin]) }
   def create
     user = User.new(user_params)
     if user.save

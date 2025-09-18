@@ -1,5 +1,6 @@
 class AuthController < ApplicationController
   skip_before_action :authorize_request
+
   def login
     email = params[:email]  
     password = params[:password]

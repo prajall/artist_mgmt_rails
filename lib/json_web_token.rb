@@ -2,7 +2,7 @@ require "jwt"
 
 class JsonWebToken
   SECRET_KEY = "jwtsecret"
-  ACCESS_TOKEN_EXPIRY = 15.minutes.freeze
+  ACCESS_TOKEN_EXPIRY = 12.hours.freeze
   REFRESH_TOKEN_EXPIRY = 7.days.freeze
 
   def self.encode(payload, exp = 24.hours.from_now)
