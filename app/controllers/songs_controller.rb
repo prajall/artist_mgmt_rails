@@ -5,9 +5,21 @@ class SongsController < ApplicationController
 
   # GET /songs
   def index
-    @songs = Song.all
-
-    render json: @songs
+    unless current_user.role == "super_admin"
+      @songs = Song.includes(:artist)
+        .where(artist: current_user.artist)
+        .page(params[:page])
+        .per(params[:limit])
+    else
+      @songs = Song.includes(:artist)
+        .page(params[:page])
+        .per(params[:limit])
+    end
+    render json: @songs.as_json(
+      include: { 
+        artist: {only: [:artist_name, :id, :first_release_year, :no_of_albums_released]}
+      }
+    )
   end
 
   # GET /songs/1
@@ -18,9 +30,21 @@ class SongsController < ApplicationController
   # POST /songs
   def create
     @song = Song.new(song_params)
-    unless current_user.super_admin?
+
+    unless current_user.role == "super_admin"
       @song.artist = current_user.artist
+    else
+      if !params[:artist]
+        return render json: {error: "Artist is required"}
+      end
+      begin
+        artist = Artist.find(params[:artist])
+      rescue ActiveRecord::RecordNotFound  
+        return render json: {error: "Invalid Artist Id"}
+      end
+      @song.artist = artist
     end
+    
     if @song.save
       render json: @song, status: :created, location: @song
     else
@@ -45,11 +69,11 @@ class SongsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_song
-      @song = Song.find(params.expect(:id))
+      @song = Song.find(params.require(:id))
     end
 
     # Only allow a list of trusted parameters through.
     def song_params
-      params.permit(:title, :genre, :artist)
+      params.permit(:title, :genre)
     end
 end
