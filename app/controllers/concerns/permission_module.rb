@@ -8,17 +8,20 @@ module PermissionModule
     end
   end
 
-  def is_owner(resource)
+  def authorize_owner_or_manager(artist)
     return if current_user.role == "super_admin"
-    unless resource.user == current_user
-      render json: {error: "Forbidden" }, status: :forbidden
-    end
-  end 
-
-  def is_manager(artist)
-    return if current_user.role == "super_admin"
-    unless artist.manager == current_user || artist.manager == current_user.id
+    unless owner?(artist) || manager?(artist)
       render json: { error: "Forbidden" }, status: :forbidden
     end
+  end
+
+  def owner?(resource)
+    return true if current_user.super_admin
+    resource.user == current_user
+  end 
+
+  def manager?(artist)
+    return true if current_user.role == "super_admin"
+    artist.manager == current_user 
   end
 end

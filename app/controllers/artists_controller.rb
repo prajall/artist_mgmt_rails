@@ -3,8 +3,7 @@ class ArtistsController < ApplicationController
 
   before_action -> { authorize_role(%w[super_admin artist_manager]) }, only: [ :create, :index ]
   before_action :set_artist, only: [ :show, :update, :destroy ]
-  before_action -> { is_owner(@artist) }, only: [ :update ]
-  before_action -> { is_manager(@artist) }, only: [ :update, :destroy ]
+  before_action -> { authorize_owner_or_manager(@artist) }, only: [ :show, :update, :destroy ]
 
   def create
     # Validate manager_id is an artist_manager
@@ -15,9 +14,18 @@ class ArtistsController < ApplicationController
 
     ActiveRecord::Base.transaction do
       user = User.new(user_params)
+
       user.role = "artist"
+      if current_user&.super_admin?
+        user.verified = true
+      end
+
       artist = Artist.new(artist_params)
       artist.user = user
+      if current_user&.artist_manager?
+        artist.manager = current_user
+      end
+
       user.save!
       artist.save!
       
@@ -35,15 +43,15 @@ class ArtistsController < ApplicationController
   # GET /artists
   def index
     if current_user&.super_admin?
-      @artists = Artist.includes(:user, :manager).all
+      @artists = Artist.includes(:user, :manager).page(params[:page]).per(params[:limit])
     elsif current_user&.artist_manager?
-      @artists = Artist.includes(:user, :manager).where(manager_id: current_user.id)
+      @artists = Artist.includes(:user, :manager).page(params[:page]).per(params[:limit]).where(manager_id: current_user.id)
     else
       render json: { error: "Forbidden" }, status: :forbidden
     end
      render json: @artists.as_json(
       include: {
-        user: { only: [ :id, :first_name, :last_name, :email, :role ]}, 
+        user: { only: [ :id, :first_name, :last_name, :email, :role, :profile_picture ]}, 
         manager: { only: [ :id, :first_name, :last_name, :email, :role ]}
       }
      )
@@ -51,10 +59,14 @@ class ArtistsController < ApplicationController
   
   # GET /artists/1
   def show
-    render json: @artist
+    render json: @artist.as_json(
+      include: {
+        user: {except: [ :password_digest ]},
+        manager: { only: [ :id, :first_name, :last_name, :email, :role ]}
+      }
+    )
   end
     
-  # POST /artists
   # PATCH/PUT /artists/1
   def update
     if @artist.update(artist_params)
@@ -98,7 +110,4 @@ class ArtistsController < ApplicationController
         :password
       )
     end
-
-
-    
 end

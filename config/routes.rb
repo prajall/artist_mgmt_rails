@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :songs
   resources :artists
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -7,7 +8,8 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   # USERS
-  post "/user", to: "users#create"
+  get "/users", to: "users#index"
+  post "/users", to: "users#create"
   post "/login", to: "auth#login"
   get "/profile", to: "users#profile"
 end
