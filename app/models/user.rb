@@ -25,4 +25,17 @@ class User < ApplicationRecord
   def password_required
     password.present? || new_record?
   end
+
+  def profile_picture_url
+    if profile_picture.attached?
+      Rails.application.routes.url_helpers.url_for(profile_picture)
+    end
+  end
+
+  def as_json(options = {})
+    super(options.merge(except: [:password_digest])).merge(
+      "profile_picture" => profile_picture_url
+   )
+  end
+
 end

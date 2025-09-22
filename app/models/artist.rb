@@ -6,4 +6,12 @@ class Artist < ApplicationRecord
 
   validates :artist_name, presence: true, length: {minimum: 3, maximum: 100}
   validates :first_release_year, numericality: {greater_than: 1800, less_than: Date.current.year} 
+
+  def as_json(options = {})
+    super(options).merge(
+      "user" => user.as_json(
+        only: [:first_name, :last_name, :email]
+      )
+    )
+  end
 end

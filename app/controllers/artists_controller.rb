@@ -5,6 +5,23 @@ class ArtistsController < ApplicationController
   before_action :set_artist, only: [ :show, :update, :destroy ]
   before_action -> { authorize_owner_or_manager(@artist) }, only: [ :show, :update, :destroy ]
 
+  def index
+    base_query = Artist.includes(:user, user:{profile_picture_attachment: :blob}) 
+    if current_user.role == "super_admin"
+      @artists = base_query 
+       .page(params[:page])
+       .per(params[:limit])
+    else 
+      @artists = base_query 
+        .includes(:manager)
+        .where(manager: current_user)
+        .page(params[:page])
+        .per(params[:limit])
+    end
+
+    return render json: @artists
+  end
+
   def create
     # Validate manager_id is an artist_manager
     manager = User.find_by(id: artist_params[:manager_id])
@@ -14,15 +31,16 @@ class ArtistsController < ApplicationController
 
     ActiveRecord::Base.transaction do
       user = User.new(user_params)
-
+      user.profile_picture.attach(params[:profile_picture]) if user_params[:profile_picture].present?
       user.role = "artist"
-      if current_user&.super_admin?
+
+      if current_user.role == "super_admin"
         user.verified = true
       end
 
       artist = Artist.new(artist_params)
       artist.user = user
-      if current_user&.artist_manager?
+      if current_user.role == "artist_manager"
         artist.manager = current_user
       end
 
@@ -39,30 +57,14 @@ class ArtistsController < ApplicationController
       render json: {error: e.record.errors.full_messages}, status: :unprocessable_entity
     end
   end
-
-  # GET /artists
-  def index
-    if current_user&.super_admin?
-      @artists = Artist.includes(:user, :manager).page(params[:page]).per(params[:limit])
-    elsif current_user&.artist_manager?
-      @artists = Artist.includes(:user, :manager).page(params[:page]).per(params[:limit]).where(manager_id: current_user.id)
-    else
-      render json: { error: "Forbidden" }, status: :forbidden
-    end
-     render json: @artists.as_json(
-      include: {
-        user: { only: [ :id, :first_name, :last_name, :email, :role, :profile_picture ]}, 
-        manager: { only: [ :id, :first_name, :last_name, :email, :role ]}
-      }
-     )
-  end
+     
   
   # GET /artists/1
   def show
     render json: @artist.as_json(
       include: {
-        user: {except: [ :password_digest ]},
-        manager: { only: [ :id, :first_name, :last_name, :email, :role ]}
+        # user: {except: [ :password_digest ]},
+        manager: { only: [ :id, :first_name, :last_name, :email ]}
       }
     )
   end
@@ -107,7 +109,8 @@ class ArtistsController < ApplicationController
         :gender,
         :address,
         :dob,
-        :password
+        :password,
+        :profile_picture
       )
     end
 end

@@ -1,13 +1,20 @@
 class SongsController < ApplicationController
   include PermissionModule
   before_action :set_song, only: %i[ show update destroy ]
-  before_action -> {authorize_role(%w[artist])}
+  before_action -> { owner(@song.artist) }, only: %i[show update destroy]
+  before_action -> {authorize_role(%w[artist])}, except: %i[index]
 
   # GET /songs
   def index
-    unless current_user.role == "super_admin"
+    if current_user.role == "artist"
       @songs = Song.includes(:artist)
-        .where(artist: current_user.artist)
+        .where(artist: current_artist)
+        .page(params[:page])
+        .per(params[:limit])
+    elsif current_user.role == "artist_manager"
+      @songs = Song.includes(:artist)
+        .joins(:artist)
+        .where(artists: {manager_id: current_user.id})
         .page(params[:page])
         .per(params[:limit])
     else

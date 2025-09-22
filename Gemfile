@@ -46,6 +46,11 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  gem 'solargraph'
+  gem 'rubocop'           # For linting
+  gem 'rubocop-rails'     # Rails-specific cops
+  gem 'rubocop-rspec'     # If you use RSpec
 end
 
 gem "bcrypt", "~> 3.1.7"

@@ -16,7 +16,7 @@ module PermissionModule
   end
 
   def owner?(resource)
-    return true if current_user.super_admin
+    return true if current_user.role == "super_admin"
     resource.user == current_user
   end 
 
