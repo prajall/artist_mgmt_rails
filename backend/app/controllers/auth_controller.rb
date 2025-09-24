@@ -5,7 +5,7 @@ class AuthController < ApplicationController
     email = params[:email]  
     password = params[:password]
 
-    user = User.find_by(email: email)
+    user = User.find_by(email: email, verified: true)
 
     if !user
      return render json: {error: "User not found."}, status: 404

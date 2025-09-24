@@ -61,6 +61,4 @@ gem "rack-cors", "~> 2.0"
 
 gem "kaminari"
 
-
-
 gem "image_processing", "~> 1.14"

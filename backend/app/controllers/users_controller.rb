@@ -14,6 +14,7 @@ class UsersController < ApplicationController
 
   def create
     user = User.new(user_params)
+    user.verified = true
     user.profile_picture.attach(params[:profile_picture]) if user_params[:profile_picture].present?
 
     if user.save
