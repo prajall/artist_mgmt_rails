@@ -25,8 +25,8 @@ const authStore = useAuthstore()
 const { handleSubmit, errors, setErrors } = useForm<LoginFormData>({
   validationSchema: toTypedSchema(loginSchema),
   initialValues: {
-    email: '',
-    password: '',
+    email: 'superadmin@gmail.com',
+    password: 'password',
   },
 })
 
